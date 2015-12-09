@@ -1,0 +1,22 @@
+{
+    "name": "byted-xhr-receive",
+    "description": "用express开启http服务和socket，http接受请求，socket同步到debug页面上,来debug",
+    "version": "0.2.0",
+    "license": "UNLICENSED",
+    "author":{"name":"wangcongwu（๑✦ˑ̫✦）"},
+    "private": false,
+    "devDependencies": {
+
+    },
+    "dependencies": {
+        "body-parser": "^1.11.0",
+        "cookie-parser": "^1.3.3",
+        "ejs": "^2.3.1",
+        "express": "^4.11.2",
+        "express-session": "^1.10.2",
+        "log4js": "^0.6.26",
+        "compression": "^1.5.0",
+        "underscore": "^1.8.3",
+        "socket.io": "^1.3.7"
+    }
+}

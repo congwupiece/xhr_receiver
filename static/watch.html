@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<style>
+*{
+    font-size: 14px;
+}
+h5{
+    font-size: 18px;
+}
+#main{
+    padding:20px 80px;
+}
+#main>div{
+    margin-bottom: 10px;
+}
+#key{
+    border: none;
+    border:1px solid #eee;
+    width: 300px;
+    border-radius: 4px;
+}
+</style>
+<body>
+<div id="main">
+    <h5>remote console.log</h5>
+    <div>
+        key:<input type="text" id="key" placeholder="写入自己的key或者点generate生成">
+    </div>
+    <div>
+
+        <button id="keyRandom">generate</button>
+    </div>
+    <div id="description">
+        <p>usage:</p>
+        <p>1.press F12 or ⌘+⌥＋i to open chrome dev tools</p>
+        <p> open console tab;</p>
+        <p>
+            2.fetch: <span style="color:blue" class="xhrurl"></span>
+        </p>
+        <p>or</p>
+        <p>
+            <span>include script:</span>
+            <span style="color:blue" class="scripturl"></span>
+        </p>
+
+        <p>then call:</p>
+        <p style="color:red">remote_console.log(data);</p>
+    </div>
+</div>
+</body>
+<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+<script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://localhost:8010/script?key=3jif5hald&host=http://10.2.24.97:8010"></script>
+<script>
+var xhrurl= '[host]/v?key=[key]&data=[data]';
+var scripturl = '[host]/script?key=[key]&host=[host]';
+
+var keyDom = document.querySelector("#key");
+var keyGen = document.querySelector("#keyRandom")
+window.addEventListener("hashchange",function(){
+    init();
+})
+keyGen.addEventListener("click",function(){
+    var randomKey  = parseInt(Math.random()*10000000000000).toString(36);
+    location.hash = randomKey;
+});
+
+
+keyDom.addEventListener("change",function(){
+    location.hash = keyDom.value;
+});
+
+function init(){
+  var hash  = location.hash.substr(1);
+  document.querySelector("#key").value = hash;
+  initListener(hash);
+  updateLink(undefined,hash);
+}
+
+function updateLink(host,key){
+    if(host){
+        scripturl = scripturl.replace(/\[host\]/g,host);
+        xhrurl = xhrurl.replace(/\[host\]/g,host);
+    }
+    if(key){
+        scripturl = scripturl.replace(/\[key\]/g,key);
+        xhrurl = xhrurl.replace(/\[key\]/g,key);
+    }
+    $(".scripturl").html(scripturl);
+    $(".xhrurl").html(xhrurl);
+
+}
+
+init();
+getHost();
+
+
+function initListener(key){
+  key = key+"";
+  var socket = io('http://localhost:8010');
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
+  socket.on('capture'+key, function (data) {
+     var data = JSON.parse(data.data);
+    //  var now = (performance.now()/1000).toFixed(2);
+    var t = new Date();
+     console.log(t.toLocaleString(),data.query);
+  });
+}
+
+
+function getHost(){
+    $.get("/net",function(r){
+        var host = "http://"+r.address+":8010";
+        updateLink(host,undefined);
+    },"json");
+}
+
+</script>
+</html>
